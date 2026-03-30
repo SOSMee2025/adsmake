@@ -28,7 +28,7 @@ export default function App() {
     localStorage.setItem('gemini_api_key', userApiKey);
   }, [userApiKey]);
 
-  const getApiKey = () => (userApiKey?.trim() || import.meta.env._API_KEY?.trim() || "AIzaSyDyMv2ms3p-Y38JdLBIrXr8991NclppCpQ");
+  const getApiKey = () => (userApiKey?.trim() || import.meta.env.VITE_GEMINI_API_KEY?.trim() || "");
 
   const generateImageViaGemini = async (
     prompt: string,
