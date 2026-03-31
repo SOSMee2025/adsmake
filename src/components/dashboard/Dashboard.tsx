@@ -10,9 +10,10 @@ import { saveAs } from 'file-saver';
 
 interface DashboardProps {
   setView: (view: 'landing' | 'app') => void;
+  session?: any;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ setView }) => {
+const Dashboard: React.FC<DashboardProps> = ({ setView, session }) => {
   const [description, setDescription] = useState('');
   const [mainImages, setMainImages] = useState<{ url: string, part: any }[]>([]);
   const [supportImages, setSupportImages] = useState<{ url: string, part: any }[]>([]);
@@ -344,7 +345,8 @@ const Dashboard: React.FC<DashboardProps> = ({ setView }) => {
           <Bot size={24} />
           ADSmake<span>.ai</span>
         </div>
-        <div className="actions" style={{ gap: '0.5rem' }}>
+        <div className="actions" style={{ gap: '0.5rem', alignItems: 'center' }}>
+          {session?.user?.email && <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginRight: '0.5rem' }} className="hidden-mobile">{session.user.email}</span>}
           <button className="btn btn-ghost" onClick={() => setView('landing')}>Volver</button>
           <button className="btn magic-glow" style={{ padding: '0.5rem 1rem' }}>Plan Pro</button>
         </div>

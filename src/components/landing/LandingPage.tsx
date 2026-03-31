@@ -1,9 +1,44 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowRight, Star, Zap, Bot, ShieldCheck, Clock, TrendingUp } from 'lucide-react';
 
+import { supabase } from '../../lib/supabase';
+
 interface LandingPageProps {
   setView: (view: 'landing' | 'app') => void;
+  session?: any;
+  forceLogin?: boolean;
 }
+
+const AuthModal = ({ onClose }: { onClose: () => void }) => {
+  const handleLogin = async (provider: 'google' | 'azure') => {
+    await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: window.location.origin + '/#app'
+      }
+    });
+  };
+
+  return (
+    <div className="lightbox-modal" style={{ zIndex: 9999, backdropFilter: 'blur(10px)' }} onClick={onClose}>
+      <div className="glass-panel" style={{ padding: '3rem 2rem', maxWidth: '400px', width: '90%', textAlign: 'center', position: 'relative' }} onClick={e => e.stopPropagation()}>
+        <button className="icon-btn" style={{ position: 'absolute', top: '1rem', right: '1rem' }} onClick={onClose}>✕</button>
+        <Bot size={48} className="gradient-text-primary" style={{ margin: '0 auto 1.5rem auto' }} />
+        <h2 style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>Únete a ADSmake</h2>
+        <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', fontSize: '0.95rem' }}>Inicia sesión de forma segura para recibir tus primeros <strong>2 créditos gratis</strong>.</p>
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <button className="btn btn-outline" style={{ padding: '1rem', justifyContent: 'center', background: 'rgba(255,255,255,0.05)' }} onClick={() => handleLogin('google')}>
+            Continuar con Google
+          </button>
+          <button className="btn btn-outline" style={{ padding: '1rem', justifyContent: 'center', background: 'rgba(255,255,255,0.05)' }} onClick={() => handleLogin('azure')}>
+            Continuar con Microsoft
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const TypingEffect = () => {
   const words = ["imágenes épicas", "videos virales", "conversión masiva"];
@@ -95,9 +130,24 @@ const BeforeAfter = () => {
   );
 };
 
-const LandingPage: React.FC<LandingPageProps> = ({ setView }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ setView, session, forceLogin }) => {
+  const [showAuth, setShowAuth] = useState(forceLogin || false);
+
+  useEffect(() => {
+    if (forceLogin && !session) setShowAuth(true);
+  }, [forceLogin, session]);
+
+  const handleCTA = () => {
+    if (session) {
+      setView('app');
+    } else {
+      setShowAuth(true);
+    }
+  };
+
   return (
     <div className="app-container" style={{ overflowX: 'hidden' }}>
+      {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
       <div className="ambient-background">
         <div className="ambient-blob blob-1"></div>
         <div className="ambient-blob blob-2"></div>
@@ -114,7 +164,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView }) => {
           <div className="actions" style={{ gap: '1rem' }}>
             <button className="btn btn-ghost hidden-mobile">Cómo funciona</button>
             <button className="btn btn-ghost hidden-mobile">Precios</button>
-            <button className="btn magic-glow" style={{ padding: '0.6rem 1.4rem' }} onClick={() => setView('app')}>Ingresar</button>
+            <button className="btn magic-glow" style={{ padding: '0.6rem 1.4rem' }} onClick={handleCTA}>Ingresar</button>
           </div>
         </nav>
       </div>
@@ -138,7 +188,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView }) => {
               Olvídate de estudios costosos y diseñadores lentos. Sube el producto que tomaste con tu celular y nuestra IA generará anuncios de nivel SuperBowl listos para Meta Ads y TikTok.
             </p>
             <div className="hero-cta-group">
-              <button className="btn magic-glow" style={{ padding: '1rem 2.5rem', fontSize: '1.1rem', borderRadius: '100px', boxShadow: '0 10px 30px rgba(100, 41, 205, 0.4)' }} onClick={() => setView('app')}>
+              <button className="btn magic-glow" style={{ padding: '1rem 2.5rem', fontSize: '1.1rem', borderRadius: '100px', boxShadow: '0 10px 30px rgba(100, 41, 205, 0.4)' }} onClick={handleCTA}>
                 Comenzar Gratis <ArrowRight size={20} />
               </button>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -269,7 +319,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView }) => {
         {/* CTA SECTION */}
         <div className="cta-section">
           <h2 className="cta-title">Listo para el futuro de Ads?</h2>
-          <button className="btn magic-glow" style={{ padding: '1.25rem 3.5rem', fontSize: '1.25rem', borderRadius: '100px', boxShadow: '0 0 40px rgba(100, 41, 205, 0.5)' }} onClick={() => setView('app')}>
+          <button className="btn magic-glow" style={{ padding: '1.25rem 3.5rem', fontSize: '1.25rem', borderRadius: '100px', boxShadow: '0 0 40px rgba(100, 41, 205, 0.5)' }} onClick={handleCTA}>
             Crear Anuncios Mágicos Ahora
           </button>
         </div>
