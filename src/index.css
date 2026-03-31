@@ -1158,7 +1158,17 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Mobile Overrides */
+.hero-cta-group {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
 @media (max-width: 768px) {
+  .hero-cta-group {
+    flex-direction: column;
+    margin-bottom: 3rem;
+  }
   .hero-grid {
     grid-template-columns: 1fr;
     gap: 2rem;

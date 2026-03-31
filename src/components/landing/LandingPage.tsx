@@ -35,6 +35,27 @@ const TypingEffect = () => {
   );
 };
 
+const AnimatedNumber = ({ value, duration = 2500, prefix = "", suffix = "", decimals = 0 }: any) => {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    let startTimestamp: number | null = null;
+    let animationFrame: number;
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      // easeOutExpo for dramatic slowdown
+      const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      setCount(easeProgress * value);
+      if (progress < 1) {
+        animationFrame = window.requestAnimationFrame(step);
+      }
+    };
+    animationFrame = window.requestAnimationFrame(step);
+    return () => window.cancelAnimationFrame(animationFrame);
+  }, [value, duration]);
+  return <span>{prefix}{count.toFixed(decimals)}{suffix}</span>;
+};
+
 const BeforeAfter = () => {
   const [sliderPos, setSliderPos] = useState(50);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -105,7 +126,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView }) => {
               <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#e0c8ff' }}>Google Gemini 3.1 Pro | Integrado</span>
             </div>
             <h1 className="hero-title-responsive">
-              Transforma fotos simples en <br/>
+              Transforma fotos simples en{' '}
               <div className="typing-container">
                 <TypingEffect />
               </div>
@@ -113,11 +134,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView }) => {
             <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)', marginBottom: '3rem', maxWidth: '90%', lineHeight: '1.6' }}>
               Olvídate de estudios costosos y diseñadores lentos. Sube el producto que tomaste con tu celular y nuestra IA generará anuncios de nivel SuperBowl listos para Meta Ads y TikTok.
             </p>
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <div className="hero-cta-group">
               <button className="btn btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.1rem', borderRadius: '100px', boxShadow: '0 10px 30px rgba(100, 41, 205, 0.4)' }} onClick={() => setView('app')}>
                 Comenzar Gratis <ArrowRight size={20} />
               </button>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginLeft: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <div style={{ display: 'flex' }}>
                   {[1, 2, 3, 4, 5].map(i => <Star key={i} size={20} fill="#f59e0b" color="#f59e0b" />)}
                 </div>
@@ -136,17 +157,17 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView }) => {
         <div style={{ padding: '3rem 2rem', margin: '4rem 0', borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)', background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.02), transparent)' }}>
           <div className="metrics-container">
             <div style={{ textAlign: 'center' }}>
-              <div className="metric-number" style={{ color: 'var(--primary)' }}>9.4x</div>
+              <div className="metric-number" style={{ color: 'var(--primary)' }}><AnimatedNumber value={9.4} decimals={1} suffix="x" /></div>
               <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px' }}>Aumento Promedio ROAS</div>
             </div>
             <div className="metric-divider"></div>
             <div style={{ textAlign: 'center' }}>
-              <div className="metric-number">+50k</div>
+              <div className="metric-number"><AnimatedNumber value={50} prefix="+" suffix="k" /></div>
               <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px' }}>Anuncios Generados</div>
             </div>
             <div className="metric-divider"></div>
             <div style={{ textAlign: 'center' }}>
-              <div className="metric-number">-40%</div>
+              <div className="metric-number"><AnimatedNumber value={40} prefix="-" suffix="%" /></div>
               <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px' }}>Costo Por Adquisición</div>
             </div>
           </div>
@@ -229,7 +250,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView }) => {
                 { src: 'ad_cosmetics.png', text: '"Despedimos a la agencia. ADSmake rinde x10 más."' }
               ].map((item, i) => (
                 <div key={i} className="glass-panel glow-card" style={{ padding: '10px', minWidth: '320px', borderRadius: 'var(--radius-lg)' }}>
-                  <img src={`/assets/${item.src}`} style={{ width: '100%', aspectRatio: '1/1', objectFit: 'cover', borderRadius: 'var(--radius-md)' }} alt="Demo" />
+                  <img src={`/assets/${item.src}`} style={{ width: '100%', height: 'auto', aspectRatio: '1/1', objectFit: 'cover', borderRadius: 'var(--radius-md)', display: 'block' }} alt="Demo" />
                   <div style={{ padding: '1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#f59e0b', marginBottom: '0.5rem' }}>
                       <Star size={14} fill="#f59e0b" /><Star size={14} fill="#f59e0b" /><Star size={14} fill="#f59e0b" /><Star size={14} fill="#f59e0b" /><Star size={14} fill="#f59e0b" />
