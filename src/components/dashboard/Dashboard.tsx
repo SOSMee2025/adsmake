@@ -336,6 +336,7 @@ const Dashboard: React.FC<DashboardProps> = ({ setView }) => {
       <div className="ambient-background">
         <div className="ambient-blob blob-1"></div>
         <div className="ambient-blob blob-2"></div>
+        <div className="ambient-blob blob-3"></div>
       </div>
 
       <nav className="navbar" style={{ padding: '0.6rem 1.5rem' }}>
@@ -345,7 +346,7 @@ const Dashboard: React.FC<DashboardProps> = ({ setView }) => {
         </div>
         <div className="actions" style={{ gap: '0.5rem' }}>
           <button className="btn btn-ghost" onClick={() => setView('landing')}>Volver</button>
-          <button className="btn btn-primary" style={{ padding: '0.5rem 1rem' }}>Plan Pro</button>
+          <button className="btn magic-glow" style={{ padding: '0.5rem 1rem' }}>Plan Pro</button>
         </div>
       </nav>
 

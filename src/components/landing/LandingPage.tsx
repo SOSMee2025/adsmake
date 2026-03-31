@@ -100,21 +100,24 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView }) => {
     <div className="app-container" style={{ overflowX: 'hidden' }}>
       <div className="ambient-background">
         <div className="ambient-blob blob-1"></div>
-        <div className="ambient-blob blob-2" style={{ left: '80%', background: '#6429cd' }}></div>
+        <div className="ambient-blob blob-2"></div>
+        <div className="ambient-blob blob-3"></div>
       </div>
 
-      <nav className="navbar" style={{ padding: '0.75rem 2rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-        <div className="logo" style={{ fontSize: '1.5rem', fontWeight: 800 }}>
-          <img src="/assets/icon.png" alt="logo" style={{ width: '32px', display: 'none' }} />
-          <Bot size={28} className="gradient-text-primary" />
-          ADSmake<span style={{ color: 'var(--primary)' }}>.ai</span>
-        </div>
-        <div className="actions">
-          <button className="btn btn-ghost">Cómo funciona</button>
-          <button className="btn btn-ghost">Precios</button>
-          <button className="btn btn-primary" onClick={() => setView('app')}>Ingresar</button>
-        </div>
-      </nav>
+      <div className="nav-pill-container">
+        <nav className="nav-pill">
+          <div className="logo cursor-pointer" onClick={() => window.scrollTo(0,0)} style={{ fontSize: '1.2rem', fontWeight: 800 }}>
+            <img src="/assets/icon.png" alt="logo" style={{ width: '32px', display: 'none' }} />
+            <Bot size={24} className="gradient-text-primary" />
+            ADSmake<span style={{ color: 'var(--primary)' }}>.ai</span>
+          </div>
+          <div className="actions" style={{ gap: '1rem' }}>
+            <button className="btn btn-ghost hidden-mobile">Cómo funciona</button>
+            <button className="btn btn-ghost hidden-mobile">Precios</button>
+            <button className="btn magic-glow" style={{ padding: '0.6rem 1.4rem' }} onClick={() => setView('app')}>Ingresar</button>
+          </div>
+        </nav>
+      </div>
 
       <main style={{ position: 'relative', zIndex: 10 }}>
         <div className="bg-grid"></div>
@@ -135,7 +138,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView }) => {
               Olvídate de estudios costosos y diseñadores lentos. Sube el producto que tomaste con tu celular y nuestra IA generará anuncios de nivel SuperBowl listos para Meta Ads y TikTok.
             </p>
             <div className="hero-cta-group">
-              <button className="btn btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.1rem', borderRadius: '100px', boxShadow: '0 10px 30px rgba(100, 41, 205, 0.4)' }} onClick={() => setView('app')}>
+              <button className="btn magic-glow" style={{ padding: '1rem 2.5rem', fontSize: '1.1rem', borderRadius: '100px', boxShadow: '0 10px 30px rgba(100, 41, 205, 0.4)' }} onClick={() => setView('app')}>
                 Comenzar Gratis <ArrowRight size={20} />
               </button>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -266,7 +269,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView }) => {
         {/* CTA SECTION */}
         <div className="cta-section">
           <h2 className="cta-title">Listo para el futuro de Ads?</h2>
-          <button className="btn btn-primary" style={{ padding: '1.25rem 3rem', fontSize: '1.25rem', borderRadius: '100px', boxShadow: '0 0 40px rgba(100, 41, 205, 0.6)' }} onClick={() => setView('app')}>
+          <button className="btn magic-glow" style={{ padding: '1.25rem 3.5rem', fontSize: '1.25rem', borderRadius: '100px', boxShadow: '0 0 40px rgba(100, 41, 205, 0.5)' }} onClick={() => setView('app')}>
             Crear Anuncios Mágicos Ahora
           </button>
         </div>
