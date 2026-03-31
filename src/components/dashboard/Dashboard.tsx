@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   Wand2, Video, Download, 
   UploadCloud, Sparkles, 
@@ -24,16 +24,11 @@ const Dashboard: React.FC<DashboardProps> = ({ setView }) => {
   const [geminiPrompts, setGeminiPrompts] = useState<{ id: string, title: string, prompt: string, imageUrl?: string, generating?: boolean, videoGenerating?: boolean, isVideo?: boolean, failed?: boolean }[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [lightboxPromptEdit, setLightboxPromptEdit] = useState('');
-  const [userApiKey, setUserApiKey] = useState(() => localStorage.getItem('gemini_api_key') || '');
   const [language, setLanguage] = useState<'es' | 'en'>('es');
   const [logoImage, setLogoImage] = useState<{ url: string, part: any } | null>(null);
   const [includeLogo, setIncludeLogo] = useState(false);
 
-  useEffect(() => {
-    localStorage.setItem('gemini_api_key', userApiKey);
-  }, [userApiKey]);
-
-  const getApiKey = () => (userApiKey?.trim() || import.meta.env.VITE_GEMINI_API_KEY?.trim() || "");
+  const getApiKey = () => (import.meta.env.VITE_GEMINI_API_KEY?.trim() || "");
 
   const generateImageViaGemini = async (
     prompt: string,
@@ -365,17 +360,12 @@ const Dashboard: React.FC<DashboardProps> = ({ setView }) => {
             
             <div className="sidebar-content">
               <div className="input-group">
-                <label className="input-label">1. API Key Gemini (Opcional)</label>
-                <input type="password" className="input-field" placeholder="AIza..." value={userApiKey} onChange={(e) => setUserApiKey(e.target.value)} />
-              </div>
-
-              <div className="input-group">
-                <label className="input-label">2. Descripción del Producto</label>
+                <label className="input-label">1. Descripción del Producto</label>
                 <textarea className="textarea-field" placeholder="Ej: SOSMee pulsera GPS para niños..." value={description} onChange={(e) => setDescription(e.target.value)}></textarea>
               </div>
 
               <div className="input-group">
-                <label className="input-label">3. Imágenes del Producto ({mainImages.length})</label>
+                <label className="input-label">2. Imágenes del Producto ({mainImages.length})</label>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))', gap: '0.5rem', marginBottom: mainImages.length > 0 ? '0.5rem' : 0 }}>
                   {mainImages.map((img, idx) => (
                     <div key={idx} style={{ position: 'relative', aspectRatio: '1/1', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
@@ -394,7 +384,7 @@ const Dashboard: React.FC<DashboardProps> = ({ setView }) => {
               </div>
 
               <div className="input-group">
-                <label className="input-label">4. Identidad Visual</label>
+                <label className="input-label">3. Identidad Visual</label>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
                   <label className="btn-upload" style={{ cursor: 'pointer', padding: '0.75rem' }}>
                     <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageUpload(e, 'logo')} />
