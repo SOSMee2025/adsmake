@@ -1,0 +1,8 @@
+# Agrega todos los archivos nuevos y modificados
+git add .
+
+# Crea un "mensaje" que describa los cambios
+git commit -m "Ajustes de diseño para dashboard sin scroll y optimización visual"
+
+# Sube los cambios a la nube (si ya tienes un repo en GitHub/Vercel)
+git push

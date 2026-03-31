@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bot, ArrowLeft, Users, DollarSign, Image as ImageIcon, Zap, Search, MoreVertical, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Bot, ArrowLeft, Users, DollarSign, Image as ImageIcon, Zap, Search, CheckCircle2, AlertCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 interface AdminDashboardProps {
@@ -7,7 +7,7 @@ interface AdminDashboardProps {
   session: any;
 }
 
-const AdminDashboard: React.FC<AdminDashboardProps> = ({ setView, session }) => {
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ setView }) => {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

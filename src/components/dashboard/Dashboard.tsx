@@ -3,7 +3,7 @@ import {
   Zap, Video, Download, 
   UploadCloud, 
   Settings2, Bot, RefreshCw, Layers, DownloadCloud,
-  User, ChevronDown, LogOut, CreditCard
+  ChevronDown, LogOut, CreditCard
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { GoogleGenerativeAI } from '@google/generative-ai';
