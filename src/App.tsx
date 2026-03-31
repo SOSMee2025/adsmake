@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import LandingPage from './components/landing/LandingPage';
 import Dashboard from './components/dashboard/Dashboard';
+import AdminDashboard from './components/admin/AdminDashboard';
 import { supabase } from './lib/supabase';
 import './index.css';
 
 export default function App() {
-  const [view, setView] = useState<'landing' | 'app'>(
-    window.location.hash === '#app' ? 'app' : 'landing'
+  const [view, setView] = useState<'landing' | 'app' | 'admin'>(
+    (window.location.hash.substring(1) as any) || 'landing'
   );
   const [session, setSession] = useState<any>(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
@@ -36,11 +37,15 @@ export default function App() {
       
       // 3. Decidir vista
       if (initialSession) {
-        setView('app');
-        if (window.location.hash !== '#app') window.location.hash = 'app';
+        if (window.location.hash === '#admin' && initialSession.user.email === 'alejandro.leon.s@gmail.com') {
+          setView('admin');
+        } else {
+          setView('app');
+          if (window.location.hash !== '#app') window.location.hash = 'app';
+        }
       } else if (!hasToken) {
         // Solo resetear a landing si NO estamos esperando un token
-        if (window.location.hash === '#app') setView('app');
+        if (window.location.hash === '#app' || window.location.hash === '#admin') setView(window.location.hash.substring(1) as any);
         else setView('landing');
       }
       
@@ -61,8 +66,12 @@ export default function App() {
       console.log("ADSmake: Cambio de Auth detectado:", event);
       setSession(newSession);
       if (newSession) {
-        if (window.location.hash !== '#app') window.location.hash = 'app';
-        setView('app');
+        if (window.location.hash === '#admin' && newSession.user.email === 'alejandro.leon.s@gmail.com') {
+          setView('admin');
+        } else {
+          if (window.location.hash !== '#app') window.location.hash = 'app';
+          setView('app');
+        }
       } else {
         setView('landing');
       }
@@ -70,8 +79,12 @@ export default function App() {
 
     // Listener de navegación manual (Atrás/Adelante)
     const handleHash = () => {
-      const isApp = window.location.hash === '#app';
-      setView(isApp ? 'app' : 'landing');
+      const hash = window.location.hash.substring(1);
+      if (hash === 'admin' && session?.user?.email === 'alejandro.leon.s@gmail.com') {
+        setView('admin');
+      } else {
+        setView(hash === 'app' ? 'app' : 'landing');
+      }
     };
 
     window.addEventListener('hashchange', handleHash);
@@ -81,8 +94,9 @@ export default function App() {
     };
   }, []);
 
-  const changeView = (newView: 'landing' | 'app') => {
-    window.location.hash = newView === 'app' ? 'app' : '';
+  const changeView = (newView: 'landing' | 'app' | 'admin') => {
+    window.location.hash = newView === 'landing' ? '' : newView;
+    setView(newView);
   };
 
   if (isLoadingAuth) {
@@ -103,12 +117,10 @@ export default function App() {
           ⚠️ {authError}
         </div>
       )}
-      {view === 'landing' 
-        ? <LandingPage setView={changeView} session={session} />
-        : (view === 'app' && !session)
-          ? <LandingPage setView={changeView} session={session} forceLogin={true} />
-          : <Dashboard setView={changeView} session={session} />
-      }
+      {view === 'landing' && <LandingPage setView={changeView} session={session} />}
+      {view === 'app' && !session && <LandingPage setView={changeView} session={session} forceLogin={true} />}
+      {view === 'admin' && session?.user?.email === 'alejandro.leon.s@gmail.com' && <AdminDashboard setView={changeView} session={session} />}
+      {view === 'app' && session && <Dashboard setView={changeView} session={session} />}
     </div>
   );
 }

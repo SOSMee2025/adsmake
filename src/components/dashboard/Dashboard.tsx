@@ -119,6 +119,11 @@ const Dashboard: React.FC<DashboardProps> = ({ setView, session }) => {
                   <CreditCard size={14} color="var(--primary)" />
                   <span style={{ fontSize: '0.85rem' }}>Créditos: <strong>{credits}</strong></span>
                 </div>
+                {session?.user?.email === 'alejandro.leon.s@gmail.com' && (
+                  <button className="btn btn-ghost" style={{ width: '100%', justifyContent: 'flex-start', padding: '0.8rem', fontSize: '0.85rem' }} onClick={() => setView('admin' as any)}>
+                    <Bot size={14} style={{ marginRight: '0.5rem' }} /> Panel Admin
+                  </button>
+                )}
                 <button className="btn btn-ghost" style={{ width: '100%', justifyContent: 'flex-start', padding: '0.8rem', fontSize: '0.85rem' }} onClick={handleLogout}>
                   <LogOut size={14} style={{ marginRight: '0.5rem' }} /> Salir de ADSmake
                 </button>
@@ -455,7 +460,7 @@ const Dashboard: React.FC<DashboardProps> = ({ setView, session }) => {
           <Bot size={24} />
           ADSmake<span>.ai</span>
         </div>
-        <div className="actions" style={{ gap: '1.2rem', alignItems: 'center' }}>
+        <div className="actions" style={{ display: 'flex', flexDirection: 'row', gap: '1.2rem', alignItems: 'center' }}>
           <div 
             className="credits-chip" 
             style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.4rem 1rem', background: 'rgba(100, 41, 205, 0.1)', borderRadius: '100px', border: '1px solid rgba(100, 41, 205, 0.2)', cursor: 'pointer' }}
