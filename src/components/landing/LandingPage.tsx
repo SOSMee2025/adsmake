@@ -98,15 +98,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView }) => {
       <main style={{ position: 'relative', zIndex: 10 }}>
         <div className="bg-grid"></div>
         {/* HERO SECTION */}
-        <div className="hero" style={{ paddingTop: '8rem', paddingBottom: '4rem', textAlign: 'left', display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '4rem', maxWidth: '1200px', margin: '0 auto', alignItems: 'center' }}>
+        <div className="hero hero-grid">
           <div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(100, 41, 205, 0.15)', padding: '0.5rem 1rem', borderRadius: '100px', border: '1px solid rgba(100, 41, 205, 0.3)', marginBottom: '2rem' }}>
               <Zap size={16} className="gradient-text-primary" />
               <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#e0c8ff' }}>Google Gemini 3.1 Pro | Integrado</span>
             </div>
-            <h1 style={{ fontSize: '4.5rem', lineHeight: '1.2', marginBottom: '1.5rem', letterSpacing: '-0.02em', minHeight: '140px' }}>
+            <h1 className="hero-title-responsive">
               Transforma fotos simples en <br/>
-              <div style={{ display: 'inline-block', whiteSpace: 'nowrap', minWidth: '500px' }}>
+              <div className="typing-container">
                 <TypingEffect />
               </div>
             </h1>
@@ -134,19 +134,19 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView }) => {
 
         {/* PERFORMANCE METRICS BAR */}
         <div style={{ padding: '3rem 2rem', margin: '4rem 0', borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)', background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.02), transparent)' }}>
-          <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className="metrics-container">
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '3rem', fontWeight: 800, color: 'var(--primary)', lineHeight: 1, marginBottom: '0.5rem' }}>9.4x</div>
+              <div className="metric-number" style={{ color: 'var(--primary)' }}>9.4x</div>
               <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px' }}>Aumento Promedio ROAS</div>
             </div>
-            <div style={{ width: '1px', height: '60px', background: 'rgba(255,255,255,0.1)' }}></div>
+            <div className="metric-divider"></div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '3rem', fontWeight: 800, color: '#fff', lineHeight: 1, marginBottom: '0.5rem' }}>+50k</div>
+              <div className="metric-number">+50k</div>
               <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px' }}>Anuncios Generados</div>
             </div>
-            <div style={{ width: '1px', height: '60px', background: 'rgba(255,255,255,0.1)' }}></div>
+            <div className="metric-divider"></div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '3rem', fontWeight: 800, color: '#fff', lineHeight: 1, marginBottom: '0.5rem' }}>-40%</div>
+              <div className="metric-number">-40%</div>
               <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px' }}>Costo Por Adquisición</div>
             </div>
           </div>
@@ -155,12 +155,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView }) => {
         {/* THE PROBLEM SECTION */}
         <div style={{ padding: '6rem 2rem', background: 'var(--bg-background)' }}>
           <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
-            <h2 style={{ fontSize: '3rem', marginBottom: '1.5rem', color: '#fff', lineHeight: '1.2' }}>Tú quieres vender. No pagar agencias ni vivir diseñando.</h2>
+            <h2 className="section-title">Tú quieres vender. No pagar agencias ni vivir diseñando.</h2>
             <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)', marginBottom: '4rem', maxWidth: '800px', margin: '0 auto 4rem auto' }}>
               Pagar $2,000/mes a una agencia y esperar semanas por un par de imágenes... Mientras tanto tu competencia duplica sus ventas con automatización.
             </p>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', textAlign: 'left' }}>
+            <div className="cards-grid">
               <div className="glass-panel" style={{ padding: '2.5rem', border: '1px solid rgba(255,0,0,0.2)' }}>
                 <h3 style={{ color: '#ff6b6b', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}><span style={{ fontSize: '1.5rem' }}>❌</span> La Vía Lenta</h3>
                 <ul style={{ listStyle: 'none', padding: 0, color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -188,11 +188,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView }) => {
         <div style={{ background: '#09090b', padding: '8rem 2rem', marginTop: '4rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-              <h2 style={{ fontSize: '3rem', marginBottom: '1rem' }}>¿Por qué ADSmake destroza<br /> a la competencia?</h2>
+              <h2 className="section-title">¿Por qué ADSmake destroza<br /> a la competencia?</h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem' }}>La plataforma más avanzada en el mercado hispano.</p>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem' }}>
+            <div className="features-grid-3">
               <div className="glass-panel glow-card" style={{ padding: '3rem 2rem', textAlign: 'center' }}>
                 <Clock size={48} className="gradient-text-primary" style={{ margin: '0 auto 1.5rem auto' }} />
                 <h3>Diseños en Segundos</h3>
@@ -214,7 +214,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView }) => {
 
         {/* INFINITE MARQUEE RESULTS */}
         <div style={{ padding: '6rem 0', textAlign: 'center', overflow: 'hidden' }}>
-          <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Míralo con tus propios ojos</h2>
+          <h2 className="section-title-md">Míralo con tus propios ojos</h2>
           <p style={{ color: 'var(--text-muted)', marginBottom: '3rem' }}>Agencias y marcas globales ya confían en nosotros.</p>
           
           <div className="marquee-wrapper">
@@ -243,8 +243,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView }) => {
         </div>
 
         {/* CTA SECTION */}
-        <div style={{ background: 'linear-gradient(to bottom, transparent, rgba(100, 41, 205, 0.1))', padding: '8rem 2rem', textAlign: 'center' }}>
-          <h2 style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>Listo para el futuro de Ads?</h2>
+        <div className="cta-section">
+          <h2 className="cta-title">Listo para el futuro de Ads?</h2>
           <button className="btn btn-primary" style={{ padding: '1.25rem 3rem', fontSize: '1.25rem', borderRadius: '100px', boxShadow: '0 0 40px rgba(100, 41, 205, 0.6)' }} onClick={() => setView('app')}>
             Crear Anuncios Mágicos Ahora
           </button>
