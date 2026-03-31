@@ -14,7 +14,7 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ setView }) => {
   const [description, setDescription] = useState('');
-  const [mainImage, setMainImage] = useState<{ url: string, part: any } | null>(null);
+  const [mainImages, setMainImages] = useState<{ url: string, part: any }[]>([]);
   const [supportImages, setSupportImages] = useState<{ url: string, part: any }[]>([]);
   const [ratio, setRatio] = useState<'1:1' | '4:5' | '9:16'>('1:1');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -105,7 +105,7 @@ const Dashboard: React.FC<DashboardProps> = ({ setView }) => {
       );
 
       if (type === 'main') {
-        setMainImage(newPairs[0]);
+        setMainImages(prev => [...prev, ...newPairs]);
       } else if (type === 'logo') {
         setLogoImage(newPairs[0]);
         setIncludeLogo(true);
@@ -116,8 +116,8 @@ const Dashboard: React.FC<DashboardProps> = ({ setView }) => {
   };
 
   const handleGenerate = async () => {
-    if (!description.trim() && !mainImage) {
-      setError("Por favor, ingresa instrucciones o sube una imagen del producto.");
+    if (!description.trim() && mainImages.length === 0) {
+      setError("Por favor, ingresa instrucciones o sube al menos una imagen del producto.");
       return;
     }
     setIsProcessing(true);
@@ -147,7 +147,7 @@ const Dashboard: React.FC<DashboardProps> = ({ setView }) => {
       `;
 
       const analysisParts = [];
-      if (mainImage) analysisParts.push(mainImage.part);
+      mainImages.forEach(mi => analysisParts.push(mi.part));
       if (logoImage) analysisParts.push(logoImage.part);
       supportImages.slice(0, 3).forEach(si => analysisParts.push(si.part));
       analysisParts.push({ text: promptText });
@@ -184,7 +184,7 @@ const Dashboard: React.FC<DashboardProps> = ({ setView }) => {
       const imagePrompt = `PHOTOREALISTIC HIGH CONVERSION AD. Ratio: ${ratio}. ${logoInstruction}\nSCENE: ${itemShell.prompt}\nOVERLAY: "${itemShell.headline}", badges: ${itemShell.features.join(', ')}, CTA: "${itemShell.cta}"`;
 
       const refs = [];
-      if (mainImage) refs.push(mainImage.part);
+      mainImages.forEach(mi => refs.push(mi.part));
       if (logoImage) refs.push(logoImage.part);
       supportImages.slice(0, 4).forEach(si => refs.push(si.part));
 
@@ -200,7 +200,7 @@ const Dashboard: React.FC<DashboardProps> = ({ setView }) => {
     try {
       const imagePrompt = `PHOTOREALISTIC AD. Ratio: ${ratio}. Generate an alternative but similar composition: ${currentPrompt}`;
       const refs = [];
-      if (mainImage) refs.push(mainImage.part);
+      mainImages.forEach(mi => refs.push(mi.part));
       if (logoImage) refs.push(logoImage.part);
       supportImages.slice(0, 4).forEach(si => refs.push(si.part));
 
@@ -213,8 +213,14 @@ const Dashboard: React.FC<DashboardProps> = ({ setView }) => {
 
   const deleteCard = (id: string) => setGeminiPrompts(prev => prev.filter(p => p.id !== id));
   const resetFlow = () => {
-    setDescription(''); setMainImage(null); setSupportImages([]); setGeminiPrompts([]);
-    setIsProcessing(false); setError('');
+    setDescription(''); 
+    setMainImages([]); 
+    setSupportImages([]); 
+    setLogoImage(null);
+    setIncludeLogo(false);
+    setGeminiPrompts([]);
+    setIsProcessing(false); 
+    setError('');
   };
 
   const downloadSingle = (imageUrl: string, id: string) => {
@@ -369,18 +375,22 @@ const Dashboard: React.FC<DashboardProps> = ({ setView }) => {
               </div>
 
               <div className="input-group">
-                <label className="input-label">3. Imagen Principal</label>
-                <label className="btn-upload" style={{ cursor: 'pointer', minHeight: '80px' }}>
-                  <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageUpload(e, 'main')} />
-                  {mainImage ? (
-                    <img src={mainImage.url} style={{ width: '80px', height: '80px', borderRadius: '8px', objectFit: 'cover' }} />
-                  ) : (
-                    <>
-                      <UploadCloud size={24} className="gradient-text-primary" />
-                      <span>Subir Foto del Producto</span>
-                    </>
-                  )}
-                </label>
+                <label className="input-label">3. Imágenes del Producto ({mainImages.length})</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))', gap: '0.5rem', marginBottom: mainImages.length > 0 ? '0.5rem' : 0 }}>
+                  {mainImages.map((img, idx) => (
+                    <div key={idx} style={{ position: 'relative', aspectRatio: '1/1', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
+                      <img src={img.url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <button 
+                        onClick={() => setMainImages(prev => prev.filter((_, i) => i !== idx))}
+                        style={{ position: 'absolute', top: 2, right: 2, background: 'rgba(0,0,0,0.5)', color: '#fff', border: 'none', borderRadius: '50%', width: '16px', height: '16px', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                      >✕</button>
+                    </div>
+                  ))}
+                  <label className="btn-upload" style={{ cursor: 'pointer', aspectRatio: '1/1', minHeight: 'auto', padding: 0 }}>
+                    <input type="file" multiple accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageUpload(e, 'main')} />
+                    <UploadCloud size={16} className="gradient-text-primary" />
+                  </label>
+                </div>
               </div>
 
               <div className="input-group">
@@ -450,7 +460,7 @@ const Dashboard: React.FC<DashboardProps> = ({ setView }) => {
             </div>
 
             <div className="sidebar-footer">
-              <button className="generate-button-premium" style={{ width: '100%' }} disabled={isProcessing || !mainImage} onClick={handleGenerate}>
+              <button className="generate-button-premium" style={{ width: '100%' }} disabled={isProcessing || mainImages.length === 0} onClick={handleGenerate}>
                 <div className="button-content">
                   {isProcessing ? <RefreshCw className="animate-spin" /> : <Wand2 />}
                   <span>{isProcessing ? 'Generando Magia...' : `Crear ${numImages} anuncios`}</span>
