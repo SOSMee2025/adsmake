@@ -12,8 +12,27 @@ export default function App() {
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
   useEffect(() => {
+    // Escáner maestro para tokens perdidos en URL (Fuerza la sesión si Supabase se duerme)
+    if (window.location.hash.includes('access_token')) {
+      const hashData = window.location.hash.substring(1);
+      const params = new URLSearchParams(hashData);
+      const access_token = params.get('access_token');
+      const refresh_token = params.get('refresh_token');
+      
+      if (access_token && refresh_token) {
+        supabase.auth.setSession({ access_token, refresh_token }).then(() => {
+          window.location.hash = 'app';
+          setView('app');
+        });
+      }
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      if (session) {
+        window.location.hash = 'app';
+        setView('app');
+      }
       setIsLoadingAuth(false);
     });
 
@@ -21,7 +40,7 @@ export default function App() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
-      if (event === 'SIGNED_IN') {
+      if (session) {
         window.location.hash = 'app';
         setView('app');
       }
