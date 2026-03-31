@@ -865,6 +865,8 @@ h1, h2, h3, h4, h5, h6 {
     position: static;
     max-height: none;
     overflow: visible;
+    width: 100%;
+    min-width: 0;
   }
   .content-area {
     overflow: visible;
@@ -939,6 +941,8 @@ h1, h2, h3, h4, h5, h6 {
   user-select: none;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: var(--bg-surface);
+  container-type: size;
+  touch-action: none;
 }
 
 .slider-img {
@@ -959,6 +963,12 @@ h1, h2, h3, h4, h5, h6 {
   width: 50%;
   overflow: hidden;
   will-change: width;
+}
+
+.slider-overlay .slider-img {
+  width: 100cqw;
+  height: 100cqh;
+  max-width: none;
 }
 
 .slider-handle {
