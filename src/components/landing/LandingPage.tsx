@@ -14,7 +14,7 @@ const AuthModal = ({ onClose }: { onClose: () => void }) => {
     await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: window.location.origin + '/#app'
+        redirectTo: window.location.origin
       }
     });
   };
