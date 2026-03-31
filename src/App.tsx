@@ -14,37 +14,33 @@ export default function App() {
 
   useEffect(() => {
     const syncAuth = async () => {
-      console.log("ADSmake: Sincronizando estado de autenticación...");
+      console.log("ADSmake: Sincronizando estado...");
       
-      // 1. Detectar tokens de OAuth en la URL
-      if (window.location.hash.includes('access_token')) {
-        console.log("ADSmake: Detectado token OAuth, importando sesión...");
-        const hashParams = new URLSearchParams(window.location.hash.substring(1).replace(/#/g, '&'));
-        const access_token = hashParams.get('access_token');
-        const refresh_token = hashParams.get('refresh_token');
-        
-        if (access_token && refresh_token) {
-          try {
-            const { data, error } = await supabase.auth.setSession({ access_token, refresh_token });
-            if (error) throw error;
-            console.log("ADSmake: Sesión OAuth inyectada con éxito:", data.user?.email);
-            window.location.hash = 'app';
-          } catch (e) {
-            console.error("ADSmake: Error fatal al inyectar sesión:", e);
-          }
-        }
+      // 1. Detectar si estamos en medio de un login OAuth
+      const hasToken = window.location.hash.includes('access_token');
+      
+      if (hasToken) {
+        console.log("ADSmake: OAuth en progreso, esperando validación...");
+        // Damos un respiro para que Supabase procese el token automáticamente
+        await new Promise(r => setTimeout(r, 1000));
       }
 
-      // 2. Obtener sesión actual
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-      setSession(currentSession);
+      // 2. Obtener sesión persistente
+      const { data: { session: initialSession }, error } = await supabase.auth.getSession();
       
-      // 3. Determinar vista inicial
-      if (currentSession) {
-        if (window.location.hash !== '#app') window.location.hash = 'app';
+      if (error) {
+        setAuthError("Fallo al obtener sesión: " + error.message);
+      }
+
+      setSession(initialSession);
+      
+      // 3. Decidir vista
+      if (initialSession) {
         setView('app');
-      } else {
-        if (window.location.hash === '#app') setView('app'); // Permitir puerta de auth
+        if (window.location.hash !== '#app') window.location.hash = 'app';
+      } else if (!hasToken) {
+        // Solo resetear a landing si NO estamos esperando un token
+        if (window.location.hash === '#app') setView('app');
         else setView('landing');
       }
       

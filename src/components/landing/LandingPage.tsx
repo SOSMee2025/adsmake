@@ -146,6 +146,16 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView, session, forceLogin 
     }
   };
 
+  const UserBadge = () => {
+    if (!session) return null;
+    return (
+      <div className="glass-pill" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '100px', border: '1px solid rgba(255,255,255,0.1)' }}>
+        <Bot size={16} className="gradient-text-primary" />
+        <span style={{ fontSize: '0.85rem' }}>Hola, <strong style={{ color: '#fff' }}>{session.user.email.split('@')[0]}</strong></span>
+      </div>
+    );
+  };
+
   return (
     <div className="app-container" style={{ overflowX: 'hidden' }}>
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
@@ -157,15 +167,17 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView, session, forceLogin 
 
       <div className="nav-pill-container">
         <nav className="nav-pill">
-          <div className="logo cursor-pointer" onClick={() => window.scrollTo(0,0)} style={{ fontSize: '1.2rem', fontWeight: 800 }}>
-            <img src="/assets/icon.png" alt="logo" style={{ width: '32px', display: 'none' }} />
-            <Bot size={24} className="gradient-text-primary" />
-            ADSmake<span style={{ color: 'var(--primary)' }}>.ai</span>
+          <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.2rem', fontWeight: 'bold', color: '#fff' }} onClick={() => setView('landing')}>
+            <Bot size={24} />
+            ADSmake<span>.ai</span>
           </div>
-          <div className="actions" style={{ gap: '1rem' }}>
+          <div className="actions" style={{ gap: '1rem', display: 'flex', alignItems: 'center' }}>
+            <UserBadge />
             <button className="btn btn-ghost hidden-mobile">Cómo funciona</button>
             <button className="btn btn-ghost hidden-mobile">Precios</button>
-            <button className="btn magic-glow" style={{ padding: '0.6rem 1.4rem' }} onClick={handleCTA}>Ingresar</button>
+            <button className="btn magic-glow" style={{ padding: '0.6rem 1.4rem' }} onClick={handleCTA}>
+              {session ? 'Abrir App' : 'Ingresar'}
+            </button>
           </div>
         </nav>
       </div>
@@ -190,14 +202,16 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView, session, forceLogin 
             </p>
             <div className="hero-cta-group">
               <button className="btn magic-glow" style={{ padding: '1rem 2.5rem', fontSize: '1.1rem', borderRadius: '100px', boxShadow: '0 10px 30px rgba(100, 41, 205, 0.4)' }} onClick={handleCTA}>
-                Comenzar Gratis <ArrowRight size={20} />
+                {session ? 'Ir a Dashboard' : 'Comenzar Gratis'} <ArrowRight size={20} />
               </button>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <div style={{ display: 'flex' }}>
-                  {[1, 2, 3, 4, 5].map(i => <Star key={i} size={20} fill="#f59e0b" color="#f59e0b" />)}
+              {!session && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex' }}>
+                    {[1, 2, 3, 4, 5].map(i => <Star key={i} size={20} fill="#f59e0b" color="#f59e0b" />)}
+                  </div>
+                  <span style={{ fontWeight: 600 }}>4.9/5 de Agencias</span>
                 </div>
-                <span style={{ fontWeight: 600 }}>4.9/5 de Agencias</span>
-              </div>
+              )}
             </div>
           </div>
 
