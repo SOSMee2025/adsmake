@@ -10,7 +10,10 @@ interface LandingPageProps {
 }
 
 const AuthModal = ({ onClose }: { onClose: () => void }) => {
-  const handleLogin = async (provider: 'google' | 'azure') => {
+  const [email, setEmail] = useState('');
+  const [isEmailSent, setIsEmailSent] = useState(false);
+
+  const handleLogin = async (provider: 'google') => {
     await supabase.auth.signInWithOAuth({
       provider,
       options: {
@@ -19,22 +22,65 @@ const AuthModal = ({ onClose }: { onClose: () => void }) => {
     });
   };
 
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: window.location.origin,
+      }
+    });
+
+    if (!error) setIsEmailSent(true);
+  };
+
   return (
     <div className="lightbox-modal" style={{ zIndex: 9999, backdropFilter: 'blur(10px)' }} onClick={onClose}>
       <div className="glass-panel" style={{ padding: '3rem 2rem', maxWidth: '400px', width: '90%', textAlign: 'center', position: 'relative' }} onClick={e => e.stopPropagation()}>
         <button className="icon-btn" style={{ position: 'absolute', top: '1rem', right: '1rem' }} onClick={onClose}>✕</button>
         <Bot size={48} className="gradient-text-primary" style={{ margin: '0 auto 1.5rem auto' }} />
-        <h2 style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>Únete a ADSmake</h2>
-        <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', fontSize: '0.95rem' }}>Inicia sesión de forma segura para recibir tus primeros <strong>2 créditos gratis</strong>.</p>
         
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <button className="btn btn-outline" style={{ padding: '1rem', justifyContent: 'center', background: 'rgba(255,255,255,0.05)' }} onClick={() => handleLogin('google')}>
-            Continuar con Google
-          </button>
-          <button className="btn btn-outline" style={{ padding: '1rem', justifyContent: 'center', background: 'rgba(255,255,255,0.05)' }} onClick={() => handleLogin('azure')}>
-            Continuar con Microsoft
-          </button>
-        </div>
+        {!isEmailSent ? (
+          <>
+            <h2 style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>Únete a ADSmake</h2>
+            <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', fontSize: '0.95rem' }}>Inicia sesión de forma segura para recibir tus primeros <strong>2 créditos gratis</strong>.</p>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <button className="btn magic-glow" style={{ padding: '1rem', justifyContent: 'center', width: '100%' }} onClick={() => handleLogin('google')}>
+                Continuar con Google
+              </button>
+              
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', margin: '1rem 0' }}>
+                <div style={{ height: '1px', flex: 1, background: 'rgba(255,255,255,0.1)' }}></div>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>o con tu correo</span>
+                <div style={{ height: '1px', flex: 1, background: 'rgba(255,255,255,0.1)' }}></div>
+              </div>
+
+              <form onSubmit={handleEmailLogin} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                <input 
+                  type="email" 
+                  placeholder="tu@email.com" 
+                  className="glass-input" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  style={{ width: '100%', padding: '0.8rem' }}
+                />
+                <button type="submit" className="btn btn-outline" style={{ justifyContent: 'center', background: 'rgba(255,255,255,0.05)' }}>
+                  Enviar Link Mágico
+                </button>
+              </form>
+            </div>
+          </>
+        ) : (
+          <div style={{ padding: '1rem' }}>
+            <Zap size={40} className="gradient-text-primary" style={{ marginBottom: '1rem' }} />
+            <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>¡Revisa tu bandeja!</h2>
+            <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>Hemos enviado un enlace de acceso mágico a <strong>{email}</strong>. Haz click en el botón del correo para entrar.</p>
+            <button className="btn btn-ghost" style={{ marginTop: '2rem' }} onClick={() => setIsEmailSent(false)}>Volver</button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -138,6 +184,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView, session, forceLogin 
     if (forceLogin && !session) setShowAuth(true);
   }, [forceLogin, session]);
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    // setSession is handled by App.tsx listener
+  };
+
   const handleCTA = () => {
     if (session) {
       setView('app');
@@ -149,9 +200,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView, session, forceLogin 
   const UserBadge = () => {
     if (!session) return null;
     return (
-      <div className="glass-pill" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '100px', border: '1px solid rgba(255,255,255,0.1)' }}>
-        <Bot size={16} className="gradient-text-primary" />
-        <span style={{ fontSize: '0.85rem' }}>Hola, <strong style={{ color: '#fff' }}>{session.user.email.split('@')[0]}</strong></span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+        <div className="glass-pill hidden-mobile" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '100px', border: '1px solid rgba(255,255,255,0.1)' }}>
+          <Bot size={16} className="gradient-text-primary" />
+          <span style={{ fontSize: '0.85rem' }}>Hola, <strong style={{ color: '#fff' }}>{session.user.email.split('@')[0]}</strong></span>
+        </div>
+        <button className="btn btn-ghost" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }} onClick={handleLogout}>Salir</button>
       </div>
     );
   };

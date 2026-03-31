@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  Wand2, Video, Download, 
+  Zap, Video, Download, 
   UploadCloud, 
   Settings2, Bot, RefreshCw, Layers, DownloadCloud 
 } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
@@ -13,13 +14,71 @@ interface DashboardProps {
   session?: any;
 }
 
+const PricingModal = ({ onClose }: { onClose: () => void }) => {
+  const plans = [
+    { name: 'Starter', price: '$29', period: '/mes', credits: '50 créditos', features: ['Sin marcas de agua', 'Soporte 24/7', 'Formatos 1:1 y 9:16'] },
+    { name: 'Agencia', price: '$99', period: '/mes', credits: '250 créditos', features: ['Acceso Admin', 'Descarga masiva ZIP', 'Nuevos estilos semanales'] },
+    { name: 'Anual Pro', price: '$290', period: '/año', credits: '1000 créditos', features: ['Ahorra 2 meses', 'Prioridad de renderizado', 'Acceso ilimitado API'] },
+  ];
+
+  return (
+    <div className="lightbox-modal" style={{ zIndex: 10000, backdropFilter: 'blur(15px)' }} onClick={onClose}>
+      <div className="glass-panel" style={{ maxWidth: '900px', width: '95%', padding: '3rem 2rem' }} onClick={e => e.stopPropagation()}>
+        <button className="icon-btn" style={{ position: 'absolute', top: '1rem', right: '1rem' }} onClick={onClose}>✕</button>
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }} className="gradient-text-primary">Elige tu Plan</h2>
+          <p style={{ color: 'var(--text-muted)' }}>Potencia tu marca con anuncios que venden de verdad.</p>
+        </div>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem' }}>
+          {plans.map((plan, i) => (
+            <div key={i} className="glass-panel" style={{ padding: '2rem', border: i === 1 ? '1px solid var(--primary)' : '1px solid rgba(255,255,255,0.1)', transform: i === 1 ? 'scale(1.05)' : 'scale(1)' }}>
+              {i === 1 && <span style={{ background: 'var(--primary)', padding: '0.3rem 0.8rem', borderRadius: '100px', fontSize: '0.7rem', position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)' }}>MÁS POPULAR</span>}
+              <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{plan.name}</h3>
+              <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>{plan.price}<span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>{plan.period}</span></div>
+              <p style={{ color: 'var(--primary)', fontWeight: 'bold', marginBottom: '1.5rem' }}>{plan.credits}</p>
+              <ul style={{ textAlign: 'left', listStyle: 'none', padding: 0, marginBottom: '2rem' }}>
+                {plan.features.map((f, j) => <li key={j} style={{ fontSize: '0.9rem', marginBottom: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Zap size={14} color="var(--primary)" /> {f}</li>)}
+              </ul>
+              <button className={`btn ${i === 1 ? 'magic-glow' : 'btn-outline'}`} style={{ width: '100%', justifyContent: 'center' }}>Seleccionar</button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Dashboard: React.FC<DashboardProps> = ({ setView, session }) => {
   const [description, setDescription] = useState('');
   const [mainImages, setMainImages] = useState<{ url: string, part: any }[]>([]);
   const [supportImages, setSupportImages] = useState<{ url: string, part: any }[]>([]);
   const [ratio, setRatio] = useState<'1:1' | '4:5' | '9:16'>('1:1');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [numImages, setNumImages] = useState(4);
+  const [numAds, setNumAds] = useState(4);
+  const [credits, setCredits] = useState<number | null>(null);
+  const [showPricing, setShowPricing] = useState(false);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!session?.user?.id) return;
+      const { data, error } = await supabase
+        .from('perfiles_usuario')
+        .select('creditos')
+        .eq('id', session.user.id)
+        .single();
+      
+      if (!error && data) {
+        setCredits(data.creditos);
+      }
+    };
+    fetchProfile();
+  }, [session]);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setView('landing');
+  };
   const [error, setError] = useState('');
   const [processStatus, setProcessStatus] = useState("Analizando producto...");
   const [geminiPrompts, setGeminiPrompts] = useState<{ id: string, title: string, prompt: string, imageUrl?: string, generating?: boolean, videoGenerating?: boolean, isVideo?: boolean, failed?: boolean }[]>([]);
@@ -127,7 +186,7 @@ const Dashboard: React.FC<DashboardProps> = ({ setView, session }) => {
         generationConfig: { responseMimeType: "application/json" }
       });
 
-      const toGenerate = Math.min(numImages, 10 - geminiPrompts.length);
+      const toGenerate = Math.min(numAds, 10 - geminiPrompts.length);
       if (toGenerate <= 0) { setIsProcessing(false); return; }
 
       setProcessStatus("Analizando identidad del producto...");
@@ -334,6 +393,7 @@ const Dashboard: React.FC<DashboardProps> = ({ setView, session }) => {
 
   return (
     <div className="app-container dashboard-view">
+      {showPricing && <PricingModal onClose={() => setShowPricing(false)} />}
       <div className="ambient-background">
         <div className="ambient-blob blob-1"></div>
         <div className="ambient-blob blob-2"></div>
@@ -345,10 +405,13 @@ const Dashboard: React.FC<DashboardProps> = ({ setView, session }) => {
           <Bot size={24} />
           ADSmake<span>.ai</span>
         </div>
-        <div className="actions" style={{ gap: '0.5rem', alignItems: 'center' }}>
+        <div className="actions" style={{ gap: '0.8rem', alignItems: 'center' }}>
+          <div className="glass-pill hidden-mobile" style={{ display: 'flex', gap: '1rem', padding: '0.4rem 1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Créditos: <strong style={{ color: 'var(--primary)' }}>{credits !== null ? credits : '...'}</strong></span>
+          </div>
           {session?.user?.email && <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginRight: '0.5rem' }} className="hidden-mobile">{session.user.email}</span>}
-          <button className="btn btn-ghost" onClick={() => setView('landing')}>Volver</button>
-          <button className="btn magic-glow" style={{ padding: '0.5rem 1rem' }}>Plan Pro</button>
+          <button className="btn btn-ghost" style={{ padding: '0.5rem 0.8rem' }} onClick={handleLogout}>Salir</button>
+          <button className="btn magic-glow" style={{ padding: '0.5rem 1rem' }} onClick={() => setShowPricing(true)}>Plan Pro</button>
         </div>
       </nav>
 
@@ -422,12 +485,12 @@ const Dashboard: React.FC<DashboardProps> = ({ setView, session }) => {
               <div className="input-group">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <label className="input-label">Generar X Anuncios</label>
-                  <span style={{ color: 'var(--primary)', fontWeight: 800 }}>{numImages}</span>
+                  <span style={{ color: 'var(--primary)', fontWeight: 800 }}>{numAds}</span>
                 </div>
                 <input 
                   type="range" min="1" max="10" step="1" 
-                  value={numImages} 
-                  onChange={(e) => setNumImages(parseInt(e.target.value))}
+                  value={numAds} 
+                  onChange={(e) => setNumAds(parseInt(e.target.value))}
                   style={{ width: '100%', accentColor: 'var(--primary)' }}
                 />
               </div>
@@ -453,12 +516,19 @@ const Dashboard: React.FC<DashboardProps> = ({ setView, session }) => {
             </div>
 
             <div className="sidebar-footer">
-              <button className="generate-button-premium" style={{ width: '100%' }} disabled={isProcessing || mainImages.length === 0} onClick={handleGenerate}>
-                <div className="button-content">
-                  {isProcessing ? <RefreshCw className="animate-spin" /> : <Wand2 />}
-                  <span>{isProcessing ? 'Generando Magia...' : `Crear ${numImages} anuncios`}</span>
+              <button 
+                className="btn magic-glow" 
+                style={{ width: '100%', marginTop: '1rem', justifyContent: 'center' }}
+                disabled={isProcessing || mainImages.length === 0}
+                onClick={handleGenerate}
+              >
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
+                    {isProcessing ? <RefreshCw className="animate-spin" /> : <Zap size={16} />} 
+                    {isProcessing ? 'Generando...' : `Crear ${numAds} anuncios`}
+                  </div>
+                  <div style={{ fontSize: '0.7rem', opacity: 0.7, fontWeight: 'normal', marginTop: '0.2rem' }}>Costo: {numAds} créditos</div>
                 </div>
-                <div className="shiny-track"></div>
               </button>
             </div>
           </aside>
