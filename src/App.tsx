@@ -12,44 +12,45 @@ export default function App() {
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
   useEffect(() => {
-    // Escáner maestro para tokens perdidos en URL (Fuerza la sesión si Supabase se duerme)
-    if (window.location.hash.includes('access_token')) {
-      const hashData = window.location.hash.substring(1);
-      const params = new URLSearchParams(hashData);
-      const access_token = params.get('access_token');
-      const refresh_token = params.get('refresh_token');
-      
-      if (access_token && refresh_token) {
-        supabase.auth.setSession({ access_token, refresh_token }).then(() => {
+    const initAuth = async () => {
+      // 1. Verificar si regresamos de un OAuth (token en URL)
+      if (window.location.hash.includes('access_token')) {
+        const hashData = window.location.hash.substring(1);
+        const params = new URLSearchParams(hashData.replace(/#/g, '&'));
+        const access_token = params.get('access_token');
+        const refresh_token = params.get('refresh_token');
+        
+        if (access_token && refresh_token) {
+          await supabase.auth.setSession({ access_token, refresh_token });
           window.location.hash = 'app';
           setView('app');
-        });
+        }
       }
-    }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session) {
+      // 2. Obtener sesión persistente
+      const { data: { session: existingSession } } = await supabase.auth.getSession();
+      setSession(existingSession);
+      if (existingSession && window.location.hash !== '#app') {
         window.location.hash = 'app';
         setView('app');
       }
       setIsLoadingAuth(false);
-    });
+    };
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      setSession(session);
-      if (session) {
+    initAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
+      setSession(newSession);
+      if (newSession && (event === 'SIGNED_IN' || event === 'USER_UPDATED')) {
         window.location.hash = 'app';
         setView('app');
       }
+      if (event === 'SIGNED_OUT') {
+        window.location.hash = '';
+        setView('landing');
+      }
     });
 
-    return () => subscription.unsubscribe();
-  }, []);
-
-  useEffect(() => {
     const handleHashChange = () => {
       if (window.location.hash === '#app') {
         setView('app');
@@ -57,8 +58,12 @@ export default function App() {
         setView('landing');
       }
     };
+
     window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener('hashchange', handleHashChange);
+    };
   }, []);
 
   const changeView = (newView: 'landing' | 'app') => {

@@ -134,6 +134,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView, session, forceLogin 
   const [showAuth, setShowAuth] = useState(forceLogin || false);
 
   useEffect(() => {
+    if (session) setShowAuth(false);
     if (forceLogin && !session) setShowAuth(true);
   }, [forceLogin, session]);
 
