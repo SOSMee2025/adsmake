@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { 
   Zap, Video, Download, 
   UploadCloud, 
-  Settings2, Bot, RefreshCw, Layers, DownloadCloud 
+  Settings2, Bot, RefreshCw, Layers, DownloadCloud,
+  User, ChevronDown, LogOut, CreditCard
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -78,6 +79,55 @@ const Dashboard: React.FC<DashboardProps> = ({ setView, session }) => {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setView('landing');
+  };
+
+  const UserDropdown = () => {
+    const [isOpen, setIsOpen] = useState(false);
+    const user = session?.user;
+    const avatarUrl = user?.user_metadata?.avatar_url;
+    const initials = user?.email?.[0]?.toUpperCase() || 'U';
+
+    return (
+      <div style={{ position: 'relative' }}>
+        <div 
+          className="glass-pill" 
+          style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', padding: '0.4rem 0.8rem', cursor: 'pointer', border: '1px solid rgba(255,255,255,0.1)' }}
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="Avatar" style={{ width: '24px', height: '24px', borderRadius: '50%' }} />
+          ) : (
+            <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
+              {initials}
+            </div>
+          )}
+          <span style={{ fontSize: '0.9rem', color: '#fff' }} className="hidden-mobile">Mi Cuenta</span>
+          <ChevronDown size={14} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.3s' }} />
+        </div>
+
+        {isOpen && (
+          <>
+            <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 90 }} onClick={() => setIsOpen(false)}></div>
+            <div className="glass-panel" style={{ position: 'absolute', top: '120%', right: 0, width: '240px', padding: '1.5rem', zIndex: 100, border: '1px solid rgba(255,255,255,0.1)', animation: 'fadeInDown 0.3s ease' }}>
+              <div style={{ marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#fff', marginBottom: '0.2rem', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.email}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Pro Account</div>
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', padding: '0.6rem 1rem', borderRadius: '8px', background: 'rgba(255,255,255,0.03)' }}>
+                  <CreditCard size={14} color="var(--primary)" />
+                  <span style={{ fontSize: '0.85rem' }}>Créditos: <strong>{credits}</strong></span>
+                </div>
+                <button className="btn btn-ghost" style={{ width: '100%', justifyContent: 'flex-start', padding: '0.8rem', fontSize: '0.85rem' }} onClick={handleLogout}>
+                  <LogOut size={14} style={{ marginRight: '0.5rem' }} /> Salir de ADSmake
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    );
   };
   const [error, setError] = useState('');
   const [processStatus, setProcessStatus] = useState("Analizando producto...");
@@ -405,13 +455,18 @@ const Dashboard: React.FC<DashboardProps> = ({ setView, session }) => {
           <Bot size={24} />
           ADSmake<span>.ai</span>
         </div>
-        <div className="actions" style={{ gap: '0.8rem', alignItems: 'center' }}>
-          <div className="glass-pill hidden-mobile" style={{ display: 'flex', gap: '1rem', padding: '0.4rem 1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
-             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Créditos: <strong style={{ color: 'var(--primary)' }}>{credits !== null ? credits : '...'}</strong></span>
+        <div className="actions" style={{ gap: '1.2rem', alignItems: 'center' }}>
+          <div 
+            className="credits-chip" 
+            style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.4rem 1rem', background: 'rgba(100, 41, 205, 0.1)', borderRadius: '100px', border: '1px solid rgba(100, 41, 205, 0.2)', cursor: 'pointer' }}
+            onClick={() => setShowPricing(true)}
+          >
+             <Zap size={14} fill="var(--primary)" color="var(--primary)" />
+             <span style={{ fontSize: '0.85rem', fontWeight: 'bold' }}><span style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>Saldo: </span>{credits !== null ? credits : '...'}</span>
           </div>
-          {session?.user?.email && <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginRight: '0.5rem' }} className="hidden-mobile">{session.user.email}</span>}
-          <button className="btn btn-ghost" style={{ padding: '0.5rem 0.8rem' }} onClick={handleLogout}>Salir</button>
-          <button className="btn magic-glow" style={{ padding: '0.5rem 1rem' }} onClick={() => setShowPricing(true)}>Plan Pro</button>
+          
+          <UserDropdown />
+          <button className="btn magic-glow" style={{ padding: '0.5rem 1rem' }} onClick={() => setShowPricing(true)}>Subir de Nivel</button>
         </div>
       </nav>
 
