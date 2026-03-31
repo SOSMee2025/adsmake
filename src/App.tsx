@@ -10,6 +10,7 @@ export default function App() {
   );
   const [session, setSession] = useState<any>(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
     const syncAuth = async () => {
@@ -51,6 +52,13 @@ export default function App() {
     };
 
     syncAuth();
+    
+    // Captura errores globales de red
+    window.addEventListener('unhandledrejection', (e) => {
+      if (e.reason?.message?.includes('Supabase')) {
+        setAuthError("Error de Conexión: " + e.reason.message);
+      }
+    });
 
     // Listener de cambios de sesión (Login/Logout)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
@@ -86,18 +94,25 @@ export default function App() {
       <div className="app-container" style={{ background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div className="animate-pulse" style={{ textAlign: 'center' }}>
           <div className="gradient-text-primary" style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>ADSmake.ai</div>
-          <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Asegurando conexión...</div>
+          <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Sincronizando con satélites...</div>
         </div>
       </div>
     );
   }
 
-  // Auth gate: Si intenta entrar al app sin sesión
-  if (view === 'app' && !session) {
-    return <LandingPage setView={changeView} session={session} forceLogin={true} />;
-  }
-
-  return view === 'landing' 
-    ? <LandingPage setView={changeView} session={session} />
-    : <Dashboard setView={changeView} session={session} />;
+  return (
+    <div className="main-wrapper">
+      {authError && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, background: '#ff4444', color: '#fff', padding: '10px', zIndex: 10000, textAlign: 'center', fontSize: '0.8rem', fontWeight: 'bold' }}>
+          ⚠️ {authError}
+        </div>
+      )}
+      {view === 'landing' 
+        ? <LandingPage setView={changeView} session={session} />
+        : (view === 'app' && !session)
+          ? <LandingPage setView={changeView} session={session} forceLogin={true} />
+          : <Dashboard setView={changeView} session={session} />
+      }
+    </div>
+  );
 }
