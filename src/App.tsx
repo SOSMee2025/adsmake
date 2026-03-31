@@ -19,8 +19,12 @@ export default function App() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
+      if (event === 'SIGNED_IN') {
+        window.location.hash = 'app';
+        setView('app');
+      }
     });
 
     return () => subscription.unsubscribe();
