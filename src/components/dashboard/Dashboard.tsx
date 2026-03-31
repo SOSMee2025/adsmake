@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Wand2, Video, Download, 
-  UploadCloud, Sparkles, 
+  UploadCloud, 
   Settings2, Bot, RefreshCw, Layers, DownloadCloud 
 } from 'lucide-react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -463,10 +463,20 @@ const Dashboard: React.FC<DashboardProps> = ({ setView }) => {
 
           <section className="content-area">
             {isProcessing && geminiPrompts.length === 0 ? (
-              <div className="processing-container animate-fade-in glass-panel">
-                <Sparkles size={48} className="gradient-text-primary animate-pulse" />
-                <h3 style={{ fontSize: '1.5rem', marginTop: '1rem' }}>{processStatus}</h3>
-                <p style={{ color: 'var(--text-muted)' }}>Optimizando encuadre y copy publicitario...</p>
+              <div className="processing-container animate-fade-in glass-panel" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '4rem' }}>
+                <div style={{ position: 'relative', width: '120px', height: '120px', marginBottom: '2rem' }}>
+                   <div className="ai-scanning-ring"></div>
+                   <Bot size={48} className="gradient-text-primary" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
+                </div>
+                <h3 style={{ fontSize: '2rem', marginBottom: '1rem', background: 'linear-gradient(to right, #ffffff, #a1a1aa)', WebkitBackgroundClip: 'text', color: 'transparent', textAlign: 'center' }}>
+                  {processStatus}
+                </h3>
+                <div className="progress-bar-container">
+                  <div className="progress-bar-fill"></div>
+                </div>
+                <p style={{ color: 'var(--text-muted)', marginTop: '2rem', textAlign: 'center', maxWidth: '400px', lineHeight: '1.6' }}>
+                  Nuestra red neuronal está extrayendo los patrones de luz y volumen de tu producto...
+                </p>
               </div>
             ) : error && geminiPrompts.length === 0 ? (
               <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center', color: '#ff6b6b' }}>
@@ -544,10 +554,20 @@ const Dashboard: React.FC<DashboardProps> = ({ setView }) => {
                 </div>
               </div>
             ) : (
-              <div className="hero glass-panel" style={{ padding: '6rem 2rem', opacity: 0.8, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                <Layers size={64} className="gradient-text-primary" style={{ marginBottom: '1rem' }} />
-                <h1 style={{ fontSize: '3rem', margin: 0 }}>Crea <span className="gradient-text-primary">Anuncios Épicos</span></h1>
-                <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)' }}>Configura tu producto a la izquierda para iniciar la magia.</p>
+              <div className="hero glass-panel animate-fade-in" style={{ padding: '6rem 2rem', opacity: 0.9, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', position: 'relative', overflow: 'hidden' }}>
+                <div className="empty-state-glow"></div>
+                <div className="icon-container-floating">
+                  <Layers size={64} className="gradient-text-primary" />
+                </div>
+                <h1 style={{ fontSize: '3rem', margin: '2rem 0 1rem 0', zIndex: 1, textAlign: 'center' }}>Adéntrate en el <span className="gradient-text-primary">Futuro</span></h1>
+                <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)', zIndex: 1, textAlign: 'center', maxWidth: '500px' }}>
+                  Sube tus imágenes en el panel izquierdo. ADSmake analizará la geometría y generará escenas fotorrealistas con iluminación de estudio en segundos.
+                </p>
+                <div style={{ display: 'flex', gap: '2rem', marginTop: '3rem', zIndex: 1, flexWrap: 'wrap', justifyContent: 'center' }}>
+                  <div className="step-badge">1. Sube tu Foto</div>
+                  <div className="step-badge">2. Elige el Formato</div>
+                  <div className="step-badge">3. Magia Pura</div>
+                </div>
               </div>
             )}
           </section>
