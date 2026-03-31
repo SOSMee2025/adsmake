@@ -485,16 +485,16 @@ const Dashboard: React.FC<DashboardProps> = ({ setView }) => {
               </div>
             ) : geminiPrompts.length > 0 ? (
               <div className="animate-fade-in">
-                <div className="results-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                  <div>
+                <div className="results-header" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
+                  <div style={{ flex: '1 1 min-content' }}>
                     <h2 style={{ fontSize: '2rem', margin: 0 }}>Resultados</h2>
                     <p style={{ color: 'var(--text-muted)', margin: 0 }}>Rendimiento esperado: Alto (Categoría: {ratio})</p>
                   </div>
-                  <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button className="btn btn-primary" onClick={downloadAllZip}>
+                  <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                    <button className="btn btn-primary" style={{ whiteSpace: 'nowrap' }} onClick={downloadAllZip}>
                       <DownloadCloud size={18} /> Descargar .ZIP
                     </button>
-                    <button className="btn btn-outline" onClick={resetFlow}>
+                    <button className="btn btn-outline" style={{ whiteSpace: 'nowrap' }} onClick={resetFlow}>
                       <RefreshCw size={18} /> Resetear
                     </button>
                   </div>
